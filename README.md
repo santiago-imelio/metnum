@@ -1,6 +1,12 @@
-# Metnum
+# Numerical Methods in Elixir
 
-**TODO: Add description**
+*Metnum* leverages [Nx](https://github.com/elixir-nx/nx) to implement a wide range of numerical methods. This library is in early development stages, but aims to provide a vast range of iterative methods seen in numerical analysis, such as:
+
+* Systems of Equations methods
+* Ordinary Differential Equations methods
+* Root Finding
+* Extrema Finding
+* Differentiation
 
 ## Installation
 
