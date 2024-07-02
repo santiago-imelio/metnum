@@ -1,4 +1,4 @@
-defmodule Metnum.Equations do
+defmodule Metnum.SOE do
   @moduledoc """
   Iterative methods for resolving a system of equations.
   """
@@ -72,7 +72,7 @@ defmodule Metnum.Equations do
     x_new = Nx.broadcast(0.0, {n})
 
     {x, _} =
-      while {x_new, {j = 1, a, b, x_prev}}, j < n do
+      while {x_new, {j = 0, a, b, x_prev}}, j < n do
         # compute terms of the numerator sum
         sum = Nx.broadcast(0.0, {1})
 
