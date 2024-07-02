@@ -22,7 +22,8 @@ defmodule Metnum.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:nx, "~> 0.7"}
+      {:nx, "~> 0.7"},
+      {:nimble_options, "~> 1.0"},
     ]
   end
 
