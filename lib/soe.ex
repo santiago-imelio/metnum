@@ -77,7 +77,7 @@ defmodule Metnum.SOE do
         sum = Nx.broadcast(0.0, {1})
 
         {sum_til_j, _} =
-          while {sum, {k = 0, j, a, x_prev}}, k < j - 1 do
+          while {sum, {k = 0, j, a, x_prev}}, k < j do
             {Nx.add(a[j][k] * x_prev[j], sum), {k + 1, j, a, x_prev}}
           end
 
