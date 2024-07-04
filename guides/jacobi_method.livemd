@@ -25,9 +25,7 @@ Given a system of linear equations $Ax = b$ of $n \times n$, the Jacobi method c
 <!-- livebook:{"break_markdown":true} -->
 
 $$
-
 x_i^{(k+1)} = \frac{1}{a_{ii}} \left( b_i - \sum_{\substack{j=1 \\ j \neq i}}^n a_{ij} x_j^{(k)} \right), \forall i \in \{1,...,n\}
-
 $$
 
 <!-- livebook:{"break_markdown":true} -->
@@ -35,9 +33,7 @@ $$
 The coefficient matrix $A$ must be **strictly diagonally dominant**. That is
 
 $$
-
 |a_{ii}| > \sum_{\substack{j=1 \\ j \neq i}}^n |a_{ij}|, \forall i
-
 $$
 
 ## Example
@@ -45,14 +41,12 @@ $$
 We will demonstrate our implementation with the following system of linear equations
 
 $$
-
 \begin{cases}
 2x_1 - x_2 = 1\\
 -x_1 + 3x_2 - x_3 = 2 \\
 -x_2 + 4x_3 - x_4 = 3 \\
 -x_3 + 5x_4 = 4
 \end{cases}
-
 $$
 
 <!-- livebook:{"break_markdown":true} -->
