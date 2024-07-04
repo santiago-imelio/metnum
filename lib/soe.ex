@@ -69,29 +69,29 @@ defmodule Metnum.SOE do
   defnp jacobi_step(a, b, x_prev) do
     {n} = Nx.shape(x_prev)
 
-    x_new = Nx.broadcast(0.0, {n})
+    x = Nx.broadcast(0.0, {n})
 
-    {x, _} =
-      while {x_new, {j = 0, a, b, x_prev}}, j < n do
+    {x_new, _} =
+      while {x, {j = 0, a, b, x_prev}}, j < n do
         # compute terms of the numerator sum
         sum = Nx.broadcast(0.0, {1})
 
         {sum_til_j, _} =
           while {sum, {k = 0, j, a, x_prev}}, k < j do
-            {Nx.add(a[j][k] * x_prev[j], sum), {k + 1, j, a, x_prev}}
+            {Nx.add(a[j][k] * x_prev[k], sum), {k + 1, j, a, x_prev}}
           end
 
         {sum_after_j, _} =
           while {sum, {k = j + 1, j, a, x_prev}}, k < n do
-            {Nx.add(a[j][k] * x_prev[j], sum), {k + 1, j, a, x_prev}}
+            {Nx.add(a[j][k] * x_prev[k], sum), {k + 1, j, a, x_prev}}
           end
 
         x_j = (b[j] - sum_til_j - sum_after_j) / a[j][j]
 
-        {Nx.put_slice(x_new, [j], Nx.broadcast(x_j, {1})),
+        {Nx.put_slice(x, [j], Nx.broadcast(x_j, {1})),
           {j + 1, a, b, x_prev}}
       end
 
-    Nx.broadcast(x, {1, n})
+    Nx.broadcast(x_new, {1, n})
   end
 end
