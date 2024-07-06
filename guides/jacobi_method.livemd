@@ -1,4 +1,4 @@
-<!-- livebook:{"persist_outputs":true} -->
+<!-- livebook:{"file_entries":[{"name":"jacobi_visualization.png","type":"attachment"}],"persist_outputs":true} -->
 
 # Jacobi Method
 
@@ -7,7 +7,9 @@ metnum_url = "https://github.com/santiago-imelio/metnum.git"
 
 Mix.install([
   {:metnum, git: metnum_url, branch: "main"},
-  {:exla, "~> 0.7.3"}
+  {:exla, "~> 0.7.3"},
+  {:tucan, "~> 0.3.1"},
+  {:kino_vega_lite, "~> 0.1.13"}
 ])
 
 Nx.global_default_backend(EXLA.Backend)
@@ -77,15 +79,17 @@ x_0 = Nx.tensor([0, 0, 0, 0])
 We run the Jacobi method with the initial approximation $x_0 = (0,0,0,0)$.
 
 ```elixir
-jacobi_seq = Metnum.SOE.jacobi(a, b, x_0, max_epochs: 25)
+epochs = 15
+
+jacobi_seq = Metnum.SOE.jacobi(a, b, x_0, max_epochs: epochs)
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
 #Nx.Tensor<
-  f32[25][4]
-  EXLA.Backend<host:0, 0.797227348.2975203344.54513>
+  f32[15][4]
+  EXLA.Backend<host:0, 0.2689180799.3054895118.170406>
   [
     [0.0, 0.0, 0.0, 0.0],
     [0.5, 0.6666666865348816, 0.75, 0.800000011920929],
@@ -105,14 +109,45 @@ jacobi_seq = Metnum.SOE.jacobi(a, b, x_0, max_epochs: 25)
 >
 ```
 
-As shown here, the method starts converging towards a solution after several iterations. In the following cell, we compare the best approximation of the sequence against the real solution.
+As shown here, the method starts converging towards a solution after several iterations. A conventional way of measuring how the algorithm converges is by using the norm of the error of each increment:
+
+$$
+||e^{(k)}|| = ||x^{(k)}-x^{(k-1)}||
+$$
 
 ```elixir
-best_approx = jacobi_seq[24]
 real_solution = Nx.LinAlg.solve(a, b)
+```
 
-IO.inspect(Nx.to_list(best_approx))
-IO.inspect(Nx.to_list(real_solution))
+<!-- livebook:{"output":true} -->
+
+```
+#Nx.Tensor<
+  f32[4]
+  EXLA.Backend<host:0, 0.2689180799.3054895118.170477>
+  [1.2823528051376343, 1.5647058486938477, 1.4117647409439087, 1.082352876663208]
+>
+```
+
+```elixir
+norms =
+  jacobi_seq
+  |> Nx.vectorize(:steps)
+  |> Nx.LinAlg.norm(ord: 2)
+  |> Nx.devectorize(keep_names: false)
+  |> Nx.to_list()
+
+errors =
+  Nx.subtract(jacobi_seq[1..(epochs - 1)], jacobi_seq[0..(epochs - 2)])
+  |> Nx.vectorize(:deltas)
+  |> Nx.LinAlg.norm(ord: 2)
+  |> Nx.devectorize(keep_names: false)
+  |> Nx.to_list()
+
+real_solution_norm =
+  real_solution
+  |> Nx.LinAlg.norm(ord: 2)
+  |> Nx.to_number()
 
 :ok
 ```
@@ -120,8 +155,34 @@ IO.inspect(Nx.to_list(real_solution))
 <!-- livebook:{"output":true} -->
 
 ```
-[1.2823526859283447, 1.5647058486938477, 1.4117646217346191, 1.082352876663208]
-[1.2823528051376343, 1.5647058486938477, 1.4117647409439087, 1.082352876663208]
+:ok
+```
+
+```elixir
+data_norms = [norm: norms, epoch: 0..(epochs - 1)]
+data_errors = [error: errors, epoch: 1..(epochs - 1)]
+
+norm_plot_opts = [title: "2-norm by epoch", height: 300, width: 400, points: true]
+hruler_opts = [line_color: "red", stroke_width: 2, stroke_dash: [3]]
+
+error_plot_opts = [
+  title: "Evolution of iteration error",
+  height: 300,
+  width: 300,
+  points: true,
+  line_color: "green",
+  point_color: "green"
+]
+
+plot =
+  Tucan.hconcat([
+    Tucan.lineplot(data_norms, "epoch", "norm", norm_plot_opts)
+    |> Tucan.hruler(real_solution_norm, hruler_opts),
+    Tucan.lineplot(data_errors, "epoch", "error", error_plot_opts)
+  ])
+
+# Comment to visualize with KinoVegaLite
+:ok
 ```
 
 <!-- livebook:{"output":true} -->
@@ -129,3 +190,7 @@ IO.inspect(Nx.to_list(real_solution))
 ```
 :ok
 ```
+
+| ![Evolution of the norm of and incremental error of each approximation](files/jacobi_visualization.png) |
+| :-----------------------------------------------------------------------------------------------------: |
+| Evolution of the norm of and incremental error of each approximation                                    |
