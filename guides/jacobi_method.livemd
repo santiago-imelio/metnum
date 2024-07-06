@@ -193,4 +193,4 @@ plot =
 
 | ![Evolution of the norm of and incremental error of each approximation](files/jacobi_visualization.png) |
 | :-----------------------------------------------------------------------------------------------------: |
-| Evolution of the norm of and incremental error of each approximation                                    |
+| Evolution of the norm and incremental error of each approximation                                       |
