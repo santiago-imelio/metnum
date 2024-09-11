@@ -8,7 +8,7 @@ defmodule Metnum.DifferentiationTest do
       eps = 0.0001
 
       # f(x) = x^2
-      func1 = &(Nx.pow(&1, 2))
+      func1 = &Nx.pow(&1, 2)
 
       # f(x) = x^3 + 3x^2 + 5
       func2 = fn x ->

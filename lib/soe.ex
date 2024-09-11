@@ -63,7 +63,7 @@ defmodule Metnum.SOE do
   end
 
   deftransformp l2_norm(x, y) do
-    Nx.subtract(x, y) |> Nx.LinAlg.norm([ord: 2])
+    Nx.subtract(x, y) |> Nx.LinAlg.norm(ord: 2)
   end
 
   defnp jacobi_step(a, b, x_prev) do
@@ -88,8 +88,7 @@ defmodule Metnum.SOE do
 
         x_j = (b[j] - sum_til_j - sum_after_j) / a[j][j]
 
-        {Nx.put_slice(x, [j], Nx.broadcast(x_j, {1})),
-          {j + 1, a, b, x_prev}}
+        {Nx.put_slice(x, [j], Nx.broadcast(x_j, {1})), {j + 1, a, b, x_prev}}
       end
 
     Nx.broadcast(x_new, {1, n})

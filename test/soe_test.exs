@@ -5,7 +5,7 @@ defmodule Metnum.SOETest do
 
   describe "#jacobi/5" do
     test "2 x 2 system of equations #1" do
-      a = Nx.tensor([[2, -1], [1,3]])
+      a = Nx.tensor([[2, -1], [1, 3]])
       b = Nx.tensor([5, 7])
 
       solution = Nx.tensor([22 / 7, 9 / 7])
@@ -14,7 +14,7 @@ defmodule Metnum.SOETest do
       epochs = 8
       x_0 = Nx.tensor([0.0, 0.0])
 
-      seq = SOE.jacobi(a, b, x_0, [max_epochs: epochs, tolerance: tol])
+      seq = SOE.jacobi(a, b, x_0, max_epochs: epochs, tolerance: tol)
 
       assert seq[0] == x_0
       assert equal_within_epsilon(seq[1], Nx.tensor([2.5, 2.333]), tol)
@@ -35,7 +35,7 @@ defmodule Metnum.SOETest do
       epochs = 30
       x_0 = Nx.tensor([1.0, 1.0])
 
-      seq = SOE.jacobi(a, b, x_0, [max_epochs: epochs])
+      seq = SOE.jacobi(a, b, x_0, max_epochs: epochs)
 
       assert seq[0] == x_0
       assert equal_within_epsilon(seq[epochs - 1], solution, 0.001)
