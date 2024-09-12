@@ -6,7 +6,7 @@ defmodule Metnum.TestHelpers do
   def equal_within_epsilon(a, b, eps \\ Nx.Constants.epsilon(:f32)) do
     if a.shape != b.shape do
       raise ArgumentError
-        "tensors must be of the same shape"
+      "tensors must be of the same shape"
     end
 
     Nx.subtract(a, b)

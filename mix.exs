@@ -23,7 +23,7 @@ defmodule Metnum.MixProject do
   defp deps do
     [
       {:nx, "~> 0.7"},
-      {:nimble_options, "~> 1.0"},
+      {:nimble_options, "~> 1.0"}
     ]
   end
 

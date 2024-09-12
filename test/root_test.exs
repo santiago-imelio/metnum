@@ -11,7 +11,7 @@ defmodule Metnum.RootTest do
       func1 = &Nx.add(Nx.pow(&1, 2), -3)
 
       # f(x) = x^2 + x - 2
-      func2 = &Nx.add(Nx.pow(&1,2), Nx.add(&1, -2))
+      func2 = &Nx.add(Nx.pow(&1, 2), Nx.add(&1, -2))
 
       epochs1 = 5
       func1_root_seq1 = R.newton_raphson(func1, 0.5, epochs1)
