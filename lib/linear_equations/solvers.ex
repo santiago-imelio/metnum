@@ -1,71 +1,13 @@
-defmodule Metnum.SOE do
+defmodule Metnum.LinearEquations.Solvers do
   @moduledoc """
   Iterative methods for resolving a linear system of equations.
   """
 
   import Nx.Defn
 
-  iterative_method_opts_schema = [
-    tolerance: [
-      doc: "The given tolerance of the solution of the system.",
-      default: Nx.Constants.epsilon(:f32)
-    ],
-    max_epochs: [
-      doc: "Maximum of iterations for the iterative method.",
-      default: 100
-    ],
-    omega: [
-      doc: "The SOR relaxation factor. Must be a real number between 0 and 2.",
-      default: 0.5
-    ]
-  ]
-
-  @iterative_method_opts_schema NimbleOptions.new!(iterative_method_opts_schema)
   @methods [jacobi: 1, gauss_seidel: 2, sor: 3]
 
-  def jacobi(
-        %Nx.Tensor{} = a,
-        %Nx.Tensor{} = b,
-        %Nx.Tensor{} = x_0,
-        opts \\ []
-      ) do
-    opts =
-      opts
-      |> NimbleOptions.validate!(@iterative_method_opts_schema)
-      |> Keyword.put(:method, @methods[:jacobi])
-
-    iterative_method_n(a, b, x_0, opts)
-  end
-
-  def gauss_seidel(
-        %Nx.Tensor{} = a,
-        %Nx.Tensor{} = b,
-        %Nx.Tensor{} = x_0,
-        opts \\ []
-      ) do
-    opts =
-      opts
-      |> NimbleOptions.validate!(@iterative_method_opts_schema)
-      |> Keyword.put(:method, @methods[:gauss_seidel])
-
-    iterative_method_n(a, b, x_0, opts)
-  end
-
-  def sor(
-        %Nx.Tensor{} = a,
-        %Nx.Tensor{} = b,
-        %Nx.Tensor{} = x_0,
-        opts \\ []
-      ) do
-    opts =
-      opts
-      |> NimbleOptions.validate!(@iterative_method_opts_schema)
-      |> Keyword.put(:method, @methods[:sor])
-
-    iterative_method_n(a, b, x_0, opts)
-  end
-
-  defnp iterative_method_n(a, b, x, opts) do
+  defn iterative_method_n(a, b, x, opts) do
     {n} = Nx.shape(x)
 
     max_epochs = opts[:max_epochs]
@@ -78,14 +20,15 @@ defmodule Metnum.SOE do
     # put x_0 in the sequence
     sol_seq = Nx.put_slice(sol_seq, [0, 0], Nx.broadcast(x, {1, n}))
 
-    method = Nx.broadcast(:nan, {opts[:method]})
+    method = @methods[opts[:solver]]
+    method_tensor = Nx.broadcast(:nan, {method})
 
     {sequence, _} =
-      while {sol_seq, {i = 0, a, b, method, w}},
+      while {sol_seq, {i = 0, a, b, method_tensor, w}},
             not end_iterative?(sol_seq, i, tol, max_epochs) do
-        x_new = iterative_method_step(a, b, sol_seq[i], method, w)
+        x_new = iterative_method_step(a, b, sol_seq[i], method_tensor, w)
 
-        {Nx.put_slice(sol_seq, [i + 1, 0], x_new), {i + 1, a, b, method, w}}
+        {Nx.put_slice(sol_seq, [i + 1, 0], x_new), {i + 1, a, b, method_tensor, w}}
       end
 
     sequence
