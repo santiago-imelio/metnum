@@ -128,7 +128,7 @@ defmodule Metnum.LinearEquationsTest do
       opts = [
         max_epochs: 9,
         solver: :sor,
-        omega: 0.9999,
+        omega: 0.9999
       ]
 
       x_0 = Nx.tensor([1.0, 1.0])
@@ -161,9 +161,25 @@ defmodule Metnum.LinearEquationsTest do
       ]
 
       seq = LE.solve(a, b, x_0, opts)
-      assert equal_within_epsilon(seq[1], Nx.tensor([0.25, -2.781, 1.629, 0.515]), opts[:tolerance])
-      assert equal_within_epsilon(seq[2], Nx.tensor([1.249, -2.245, 1.969, 0.911]), opts[:tolerance])
-      assert equal_within_epsilon(seq[3], Nx.tensor([2.070, -1.670, 1.590, 0.762]), opts[:tolerance])
+
+      assert equal_within_epsilon(
+               seq[1],
+               Nx.tensor([0.25, -2.781, 1.629, 0.515]),
+               opts[:tolerance]
+             )
+
+      assert equal_within_epsilon(
+               seq[2],
+               Nx.tensor([1.249, -2.245, 1.969, 0.911]),
+               opts[:tolerance]
+             )
+
+      assert equal_within_epsilon(
+               seq[3],
+               Nx.tensor([2.070, -1.670, 1.590, 0.762]),
+               opts[:tolerance]
+             )
+
       assert equal_within_epsilon(seq[29], solution, opts[:tolerance])
     end
   end
