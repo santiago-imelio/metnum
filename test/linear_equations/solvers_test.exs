@@ -1,7 +1,7 @@
-defmodule Metnum.LinearEquationsTest do
+defmodule Metnum.SolversTest do
   use Metnum.Case
 
-  alias Metnum.LinearEquations, as: LE
+  alias Metnum.LinearEquations.Solvers
 
   describe "jacobi solver" do
     test "2 x 2 system of equations #1" do
@@ -13,12 +13,13 @@ defmodule Metnum.LinearEquationsTest do
       opts = [
         max_epochs: 8,
         tolerance: 0.01,
-        solver: :jacobi
+        solver: :jacobi,
+        omega: 0.5
       ]
 
       x_0 = Nx.tensor([0.0, 0.0])
 
-      seq = LE.solve(a, b, x_0, opts)
+      {seq, _} = Solvers.iterative_method(a, b, x_0, opts)
 
       assert seq[0] == x_0
       assert equal_within_epsilon(seq[1], Nx.tensor([2.5, 2.333]), opts[:tolerance])
@@ -38,15 +39,17 @@ defmodule Metnum.LinearEquationsTest do
 
       opts = [
         max_epochs: 30,
-        solver: :jacobi
+        tolerance: 0.001,
+        solver: :jacobi,
+        omega: 0.5
       ]
 
       x_0 = Nx.tensor([1.0, 1.0])
 
-      seq = LE.solve(a, b, x_0, opts)
+      {seq, _} = Solvers.iterative_method(a, b, x_0, opts)
 
       assert seq[0] == x_0
-      assert equal_within_epsilon(seq[opts[:max_epochs] - 1], solution, 0.001)
+      assert equal_within_epsilon(seq[opts[:max_epochs] - 1], solution, opts[:tolerance])
     end
   end
 
@@ -60,12 +63,13 @@ defmodule Metnum.LinearEquationsTest do
       opts = [
         max_epochs: 5,
         tolerance: 0.01,
-        solver: :gauss_seidel
+        solver: :gauss_seidel,
+        omega: 0.5
       ]
 
       x_0 = Nx.tensor([0.0, 0.0])
 
-      seq = LE.solve(a, b, x_0, opts)
+      {seq, _} = Solvers.iterative_method(a, b, x_0, opts)
 
       assert seq[0] == x_0
       assert equal_within_epsilon(seq[1], Nx.tensor([2.5, 1.5]), opts[:tolerance])
@@ -82,15 +86,17 @@ defmodule Metnum.LinearEquationsTest do
 
       opts = [
         max_epochs: 9,
-        solver: :gauss_seidel
+        tolerance: 0.001,
+        solver: :gauss_seidel,
+        omega: 0.5
       ]
 
       x_0 = Nx.tensor([1.0, 1.0])
 
-      seq = LE.solve(a, b, x_0, opts)
+      {seq, _} = Solvers.iterative_method(a, b, x_0, opts)
 
       assert seq[0] == x_0
-      assert equal_within_epsilon(seq[opts[:max_epochs] - 1], solution, 0.001)
+      assert equal_within_epsilon(seq[opts[:max_epochs] - 1], solution, opts[:tolerance])
     end
   end
 
@@ -110,7 +116,7 @@ defmodule Metnum.LinearEquationsTest do
 
       x_0 = Nx.tensor([0.0, 0.0])
 
-      seq = LE.solve(a, b, x_0, opts)
+      {seq, _} = Solvers.iterative_method(a, b, x_0, opts)
 
       assert seq[0] == x_0
       assert equal_within_epsilon(seq[1], Nx.tensor([2.5, 1.5]), opts[:tolerance])
@@ -127,16 +133,17 @@ defmodule Metnum.LinearEquationsTest do
 
       opts = [
         max_epochs: 9,
+        tolerance: 0.001,
         solver: :sor,
         omega: 0.9999
       ]
 
       x_0 = Nx.tensor([1.0, 1.0])
 
-      seq = LE.solve(a, b, x_0, opts)
+      {seq, _} = Solvers.iterative_method(a, b, x_0, opts)
 
       assert seq[0] == x_0
-      assert equal_within_epsilon(seq[opts[:max_epochs] - 1], solution, 0.001)
+      assert equal_within_epsilon(seq[opts[:max_epochs] - 1], solution, opts[:tolerance])
     end
 
     test "4 x 4 system of equations" do
@@ -160,7 +167,7 @@ defmodule Metnum.LinearEquationsTest do
         omega: 0.5
       ]
 
-      seq = LE.solve(a, b, x_0, opts)
+      {seq, _} = Solvers.iterative_method(a, b, x_0, opts)
 
       assert equal_within_epsilon(
                seq[1],

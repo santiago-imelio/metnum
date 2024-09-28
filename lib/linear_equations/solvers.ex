@@ -7,7 +7,7 @@ defmodule Metnum.LinearEquations.Solvers do
 
   @methods [jacobi: 1, gauss_seidel: 2, sor: 3]
 
-  defn iterative_method_n(a, b, x, opts) do
+  defn iterative_method(a, b, x, opts) do
     {n} = Nx.shape(x)
 
     max_epochs = opts[:max_epochs]
@@ -23,7 +23,7 @@ defmodule Metnum.LinearEquations.Solvers do
     method = @methods[opts[:solver]]
     method_tensor = Nx.broadcast(:nan, {method})
 
-    {sequence, _} =
+    {sequence, {last_i, _, _, _, _}} =
       while {sol_seq, {i = 0, a, b, method_tensor, w}},
             not end_iterative?(sol_seq, i, tol, max_epochs) do
         x_new = iterative_method_step(a, b, sol_seq[i], method_tensor, w)
@@ -31,7 +31,7 @@ defmodule Metnum.LinearEquations.Solvers do
         {Nx.put_slice(sol_seq, [i + 1, 0], x_new), {i + 1, a, b, method_tensor, w}}
       end
 
-    sequence
+    {sequence, last_i}
   end
 
   defnp iterative_method_step(a, b, x_prev, method_tensor, w) do
